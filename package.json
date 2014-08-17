@@ -1,6 +1,13 @@
 {
     "name": "vkCLI",
     "version": "0.0.1",
+    "description": "vk cli chat",
+    "keywords": "chat vk cli",
+    "homepage": "https://github.com/Corey-Maler/vkcli",
+    "bugs": "https://github.com/Corey-Maler/vkcli/issues",
+    "license": "MIT",
+    "author": "Corey Maler <corey.maler@outlook.com> (https://corey-maler.github.io)",
+    "bin": "./app.js",
     "dependencies":
     {
         "open":"*",
