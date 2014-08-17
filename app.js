@@ -81,24 +81,65 @@ var afterConnect = function()
     var print = require('./lib/print')(vk);
     vk.req('getProfiles', {uid: "66748"});
 
-    vk.getDialogs().then(vk.formatUserList).then(vk.printDialogs).then(print.arr);
+    vk.getUsersFromDialogs().then(vk.formatUserList).then(vk.printDialogs).then(print.arr);
 
     setInterval(function()
     {
-        vk.getUnread();
+        vk.getUnread().then(print.arr);
     }, 1000);
 
 
     var com = /([0-9a-zA-Z]+): (.+)/i;
+    var ifargs = /^:\b([a-zA-Z0-9]+)\b/gi;
+    var args = /\b([a-zA-Z0-9]+)\b/gi;
 
-    rl.on('line', function(cmd)
+    var sendMes = function(str)
     {
-
         var a = cmd.match(com);
         var to = a[1];
         var body = a[2];
 
         vk.sendMessage(to, body);
+    }
+
+    var commands =
+    {
+        chats: function(args)
+        {
+            print.status('Conversation list:');
+            vk.getDialogs(args[1]).then(print.arr);
+        }
+    }
+
+    var command = function(str)
+    {
+        var a = str.match(args);
+        console.log('You command: ', a[0]);
+        console.log('args: ', a[2], a[3]);
+
+        console.log(a);
+
+        if (typeof commands[a[0]] == "function")
+        {
+            commands[a[0]](a);
+        }
+
+    }
+
+    rl.on('line', function(cmd)
+    {
+        if (com.test(cmd))
+        {
+            sendMes(cmd);
+        }
+        else
+        {
+            if (cmd.charAt(0) == ":")
+                command(cmd);
+            else
+                print.error('Unknown symbol. Print :h for help')
+        }
+
     });
 }
 
