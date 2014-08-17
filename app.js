@@ -33,14 +33,15 @@ var VK = function(_app)
 
             for (var i in data)
             {
-                path = i + "=" + data[i] + "&";
+                path += i + "=" + encodeURIComponent(data[i]) + "&";
             }
 
             var uri = "https://api.vk.com/method/"+method+"?"+path+"access_token="+app.access_token;
+            console.log('request uri: ', uri);
 
             request(uri, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
-                    console.log(body) // Print the google web page.
+                    def.resolve(JSON.parse(body));
                 }
             });
 
@@ -98,8 +99,14 @@ var afterConnect = function()
     var vk = VK(app);
     vk.req('getProfiles', {uid: "66748"});
 
+
+
     rl.on('line', function(cmd)
     {
+        vk.req('messages.send', {user_id: 158530417, message: cmd}).then(function(data)
+        {
+           console.log(data);
+        });
         console.log(cmd);
     });
 }
