@@ -15,15 +15,16 @@ Run: ```vkcli```
 
 Config file: .vkclirs (in json)
 
-Usage:
 
+Usage:
+Send message to user:
 ```alias: message```
 
-Alias -- user number (displaed as ```{x}``` in list)
+Alias -- user number or alias (displaed as ```{x}``` in list)
 
 message: your message
 
 Commands:
 
 ```:chats``` - display chats
-```:alias from to``` - change user alias (saving in your .vkclirs
+```:alias from to``` - change user alias (saving in your .vkclirs)
