@@ -93,7 +93,7 @@ var afterConnect = function()
     var ifargs = /^:\b([a-zA-Z0-9]+)\b/gi;
     var args = /\b([a-zA-Z0-9]+)\b/gi;
 
-    var sendMes = function(str)
+    var sendMes = function(cmd)
     {
         var a = cmd.match(com);
         var to = a[1];
@@ -108,16 +108,23 @@ var afterConnect = function()
         {
             print.status('Conversation list:');
             vk.getDialogs(args[1]).then(print.arr);
+        },
+        alias: function(args)
+        {
+            if (args.length != 3)
+            {
+                print.error('alias must have 2 args: from to');
+            }
+            else
+            {
+                vk.setAlias(args[1], args[2]);
+            }
         }
     }
 
     var command = function(str)
     {
         var a = str.match(args);
-        console.log('You command: ', a[0]);
-        console.log('args: ', a[2], a[3]);
-
-        console.log(a);
 
         if (typeof commands[a[0]] == "function")
         {
