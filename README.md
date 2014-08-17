@@ -22,3 +22,8 @@ Usage:
 Alias -- user number (displaed as ```{x}``` in list)
 
 message: your message
+
+Commands:
+
+```:chats``` - display chats
+```:alias from to``` - change user alias (saving in your .vkclirs
