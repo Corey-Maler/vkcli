@@ -19,6 +19,16 @@ var app =
     access_token: config.get('access_token')
 }
 
+Array.prototype.contains = function(obj) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
 var VK = function(_app)
 {
     var app = _app;
@@ -28,6 +38,8 @@ var VK = function(_app)
     var nextAlias = 0;
 
     var dialogs = [];
+
+    var printed = [];
 
     var c = {
         req: function(method, data)
@@ -42,8 +54,8 @@ var VK = function(_app)
                 path += i + "=" + encodeURIComponent(data[i]) + "&";
             }
 
-            var uri = "https://api.vk.com/method/"+method+"?"+path+"access_token="+app.access_token;
-            console.log('request uri: ', uri);
+            var uri = "https://api.vk.com/method/"+method+"?"+path+"access_token="+app.access_token+"&v=5.24";
+            //console.log('request uri: ', uri);
 
             request(uri, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
@@ -62,8 +74,9 @@ var VK = function(_app)
                 for (var i in data.response)
                 {
                     var u = data.response[i];
+                    console.log(u);
                     u.alias = nextAlias ++;
-                    users[u.uid] = u;
+                    users[u.id] = u;
                 }
                 def.resolve();
             });
@@ -85,7 +98,7 @@ var VK = function(_app)
             for (var i in dialogs)
             {
                 var ms = dialogs[i];
-                var u = users[ms.uid];
+                var u = users[ms.user_id];
                 console.log(u.first_name + " " + u.last_name + " {"+ u.alias + "}:");
                 console.log(ms.body);
             }
@@ -96,11 +109,11 @@ var VK = function(_app)
             c.req('messages.getDialogs', {count: 10}).then(function(data)
             {
                 var ulist = [];
-                var d = data.response;
-                for (var i = 1; i < d.length; i++)
+                var d = data.response.items;
+                for (var i = 0; i < d.length; i++)
                 {
-                    var mess = d[i];
-                    if (mess.uid) ulist.push(mess.uid);
+                    var mess = d[i].message;
+                    if (typeof mess.user_id != "undefined") ulist.push(mess.user_id);
                     dialogs.push(mess);
                 }
 
@@ -108,6 +121,29 @@ var VK = function(_app)
             });
 
             return def.promise;
+        },
+        getUnread: function()
+        {
+            c.req('messages.getDialogs', {count: 10, unread: 1}).then(function(data)
+            {
+                var ulist = [];
+                var d = data.response.items;
+                for (var i = 0; i < d.length; i++)
+                {
+                    var mess = d[i].message;
+
+                    if (printed.contains(mess.id)) continue;
+
+                    printed.push(mess.id);
+
+                    var unread = d[i].unread;
+                    var u = users[mess.user_id];
+
+                    console.log(u.first_name + " " + u.last_name + " {"+ u.alias + "}, unread "+unread+":");
+                    console.log(mess.body);
+                }
+
+            });
         }
 
     }
@@ -164,6 +200,11 @@ var afterConnect = function()
     vk.req('getProfiles', {uid: "66748"});
 
     vk.getDialogs().then(vk.formatUserList).then(vk.printDialogs);
+
+    setInterval(function()
+    {
+        vk.getUnread();
+    }, 1000);
 
 
     var com = /([0-9a-zA-Z]+): (.+)/i;
