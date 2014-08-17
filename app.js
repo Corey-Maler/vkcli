@@ -23,7 +23,13 @@ var VK = function(_app)
 {
     var app = _app;
 
-    return {
+    var users = {};
+
+    var nextAlias = 0;
+
+    var dialogs = [];
+
+    var c = {
         req: function(method, data)
         {
             var def = Q.defer();
@@ -46,9 +52,67 @@ var VK = function(_app)
             });
 
             return def.promise;
+        },
+        formatUserList: function(ids)
+        {
+            var def = Q.defer();
+            var uids = ids.join(',');
+            c.req('users.get', {user_ids: uids}).then(function(data)
+            {
+                for (var i in data.response)
+                {
+                    var u = data.response[i];
+                    u.alias = nextAlias ++;
+                    users[u.uid] = u;
+                }
+                def.resolve();
+            });
+
+            return def.promise;
+        },
+        user: function(alias)
+        {
+          for (var i in users)
+          {
+              if (users[i].alias == alias)
+              {
+                  return i;
+              }
+          }
+        },
+        printDialogs: function(data)
+        {
+            for (var i in dialogs)
+            {
+                var ms = dialogs[i];
+                var u = users[ms.uid];
+                console.log(u.first_name + " " + u.last_name + " {"+ u.alias + "}:");
+                console.log(ms.body);
+            }
+        },
+        getDialogs: function()
+        {
+            var def = Q.defer();
+            c.req('messages.getDialogs', {count: 10}).then(function(data)
+            {
+                var ulist = [];
+                var d = data.response;
+                for (var i = 1; i < d.length; i++)
+                {
+                    var mess = d[i];
+                    if (mess.uid) ulist.push(mess.uid);
+                    dialogs.push(mess);
+                }
+
+                def.resolve(ulist);
+            });
+
+            return def.promise;
         }
 
     }
+
+    return c;
 };
 
 
@@ -99,15 +163,26 @@ var afterConnect = function()
     var vk = VK(app);
     vk.req('getProfiles', {uid: "66748"});
 
+    vk.getDialogs().then(vk.formatUserList).then(vk.printDialogs);
 
+
+    var com = /([0-9a-zA-Z]+): (.+)/i;
 
     rl.on('line', function(cmd)
     {
-        vk.req('messages.send', {user_id: 158530417, message: cmd}).then(function(data)
+
+        var a = cmd.match(com);
+        //console.log(a);
+        var to = a[1];
+        var body = a[2];
+
+
+
+        vk.req('messages.send', {user_id: vk.user(to), message: body}).then(function(data)
         {
-           console.log(data);
+           //console.log('sen');
         });
-        console.log(cmd);
+        //console.log(cmd);
     });
 }
 
