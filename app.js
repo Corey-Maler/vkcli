@@ -78,9 +78,10 @@ var connect = function()
 var afterConnect = function()
 {
     var vk = VK(app);
+    var print = require('./lib/print')(vk);
     vk.req('getProfiles', {uid: "66748"});
 
-    vk.getDialogs().then(vk.formatUserList).then(vk.printDialogs);
+    vk.getDialogs().then(vk.formatUserList).then(vk.printDialogs).then(print.arr);
 
     setInterval(function()
     {
