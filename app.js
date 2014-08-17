@@ -1,3 +1,4 @@
+#!node
 var open = require('open');
 var Q = require('q');
 var request = require('request');
