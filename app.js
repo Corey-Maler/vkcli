@@ -16,7 +16,6 @@ var rl = readline.createInterface(
 var app =
 {
     appID : 4509664,
-    appSecret: 'OmP8REoS6fVjnRW8wZ92',
     access_token: config.get('access_token')
 }
 
@@ -75,7 +74,6 @@ var VK = function(_app)
                 for (var i in data.response)
                 {
                     var u = data.response[i];
-                    console.log(u);
                     u.alias = nextAlias ++;
                     users[u.id] = u;
                 }
@@ -98,6 +96,7 @@ var VK = function(_app)
         {
             for (var i in dialogs)
             {
+                if (typeof dialogs[i].body == "undefined") continue;
                 var ms = dialogs[i];
                 var u = users[ms.user_id];
                 console.log(u.first_name + " " + u.last_name + " {"+ u.alias + "}:");
@@ -214,7 +213,6 @@ var afterConnect = function()
     {
 
         var a = cmd.match(com);
-        //console.log(a);
         var to = a[1];
         var body = a[2];
 
@@ -222,9 +220,7 @@ var afterConnect = function()
 
         vk.req('messages.send', {user_id: vk.user(to), message: body}).then(function(data)
         {
-           //console.log('sen');
         });
-        //console.log(cmd);
     });
 }
 
