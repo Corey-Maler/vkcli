@@ -5,6 +5,10 @@ CLI vk chat on node.js
 
 Allow you to char from console.
 
+Screenshot:
+
+![ScreenShot](https://raw.githubusercontent.com/Corey-Maler/vkcli/master/screenshot.png)
+
 Installation: ```npm install -g vkcli```
 
 Run: ```vkcli```
