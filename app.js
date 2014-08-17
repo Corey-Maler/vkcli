@@ -75,6 +75,10 @@ var connect = function()
 
         app.access_token = a[1];
         config.set('access_token', app.access_token);
+        config.save(function(err)
+        {
+            if (err) throw err;
+        });
         console.log(a);
         console.log('Your page: ', login);
 
