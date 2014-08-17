@@ -14,6 +14,7 @@
         "q": "*",
         "request":"*",
         "nconf": "*",
-        "homedir": "*"
+        "homedir": "*",
+        "cli-color": "*"
     }
 }
