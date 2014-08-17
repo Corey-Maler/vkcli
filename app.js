@@ -1,5 +1,4 @@
-var vksdk = require('vksdk');
-var vk = new vksdk({appID: 4509664, appSecret: 'OmP8REoS6fVjnRW8wZ92', 'mode': "oauth"});
+var open = require('open');
 
 var readline = require('readline');
 
@@ -10,26 +9,39 @@ var rl = readline.createInterface(
         terminal: false
     });
 
-var acc = {login: null, pass: null};
-var connect = function(acc)
+var app =
 {
-    vk.acquireToken(acc.login, acc.pass);
-    vk.on('appServerTokenReady', function() {
-        vk.request('acquireTokenReady');
-        // etc
+    appID : 4509664,
+    appSecret: 'OmP8REoS6fVjnRW8wZ92',
+    access_token: null
+}
 
-        console.log('connected');
+var connect = function()
+{
+    /*
+     https://oauth.vk.com/authorize?
+     client_id=APP_ID&
+     scope=PERMISSIONS&
+     redirect_uri=REDIRECT_URI&
+     display=DISPLAY&
+     v=API_VERSION&
+     response_type=token
+     */
 
+    var page = "https://oauth.vk.com/authorize?";
+    page += "client_id="+app.appID;
+    page += "&scope=4096";
+    page += "&redirect_uri=https://oauth.vk.com/blank.html";
+    page += "&display=popup";
+    page += "&v=5.24";
+    page += "&response_type=token";
 
+    /*
+    open(page, function(err, a, b)
+    {
+        if (err) throw err;
     });
-
-    vk.request('getProfiles', {'uids' : '29894'});
-    vk.on('done:getProfiles', function(_o) {
-        console.log(_o);
-    });
-    vk.on('acquireTokenNotReady', function(_error) {
-        // error handler
-    });
+    */
 };
 
 rl.on('line', function(cmd)
@@ -37,18 +49,12 @@ rl.on('line', function(cmd)
    console.log(cmd);
 });
 
-rl.question("Enter you vk login: ", function(login)
+connect();
+rl.question("Please, copy URI of opened page and paste: ", function(login)
 {
-    console.log('You login: ', login);
-    acc.login = login;
-    rl.question("Your password: ", function(pass)
-    {
-        console.log('Your password: ', pass);
-        acc.pass = pass;
-
-        console.log('Trying to connect...');
-        connect(acc);
-
-    });
+    var reg = /access_token=(.+)&expires_in=(.+)&user_id=(.+)$/i;
+    var a = login.match(reg);
+    console.log(a);
+    console.log('Your page: ', login);
 });
 
