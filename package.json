@@ -3,7 +3,9 @@
     "version": "0.0.1",
     "dependencies":
     {
-        "vksdk":"*",
-        "open":"*"
+        "open":"*",
+        "q": "*",
+        "request":"*",
+        "nconf": "*"
     }
 }
