@@ -5,10 +5,10 @@ var screen = blessed.screen();
 
 var box = blessed.box(
     {
-        top: '0',
-        left: '0',
-        width: "30%",
-        height: '100%',
+        top: 0,
+        left: 0,
+        width: 30,
+        height: screen.height,
         content: "hello {bold}world{/bold}!",
         tags: true,
         border:
@@ -32,10 +32,10 @@ var box = blessed.box(
 
 var chat = blessed.box(
     {
-        top: '0',
-        left: '30%',
-        width: "70%",
-        height: '90%',
+        top: 0,
+        left: 30,
+        width: screen.width - 30,
+        height: screen.height - 3,
         content: "hello {right}{bold}world{/bold}{/right}!",
         tags: true,
         border:
@@ -59,11 +59,11 @@ var chat = blessed.box(
 
 var input = blessed.box(
     {
-        left: '30%',
+        left: 30,
         //top: 'bottom',
-        bottom: '0',
-        width: "70%",
-        height: '3',
+        bottom: 0,
+        width: screen.width - 30,
+        height: 3,
         content: "input",
         tags: true,
         border:
@@ -95,7 +95,15 @@ screen.key([':'], function(ch, key)
     screen.render();
 });
 
-screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+var message = "";
+
+screen.key(['i'], function(ch, key)
+{
+    message += "2";
+    redraw();
+});
+
+screen.key(['escape', 'C-c'], function(ch, key) {
     return process.exit(0);
 });
 
@@ -119,6 +127,7 @@ var redraw = function()
         box.insertLine(1, str);
     }
 
+    input.setContent(message);
     screen.render();
 }
 
