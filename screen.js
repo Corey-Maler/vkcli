@@ -11,7 +11,7 @@ var box = blessed.box(
         top: 0,
         left: 0,
         width: 30,
-        height: screen.height,
+        height: screen.height - 1,
         content: "hello {bold}world{/bold}!",
         tags: true,
         border:
@@ -38,7 +38,7 @@ var chat = blessed.box(
         top: 0,
         left: 30,
         width: screen.width - 30,
-        height: screen.height - 3,
+        height: screen.height - 4,
         content: "hello {right}{bold}world{/bold}{/right}!",
         tags: true,
         border:
@@ -64,7 +64,7 @@ var input = blessed.box(
     {
         left: 30,
         //top: 'bottom',
-        bottom: 0,
+        bottom: 1,
         width: screen.width - 30,
         height: 3,
         content: "input",
@@ -88,9 +88,21 @@ var input = blessed.box(
     }
 );
 
+var status = blessed.box(
+    {
+        left: 0,
+        width: screen.width,
+        bottom: 0,
+        height: 1,
+        content: "status",
+        tags: true
+    }
+)
+
 screen.append(box);
 screen.append(chat);
 screen.append(input);
+screen.append(status);
 
 screen.key([':'], function(ch, key)
 {
@@ -112,16 +124,37 @@ program.on('keypress', function(ch, key)
             case 'i':
                 mode = 1;
                 break;
+
+        }
+
+        switch (key.name)
+        {
+            case 'up':
+                break;
+            case 'down':
+                break;
         }
     }
     else
     {
-        message += ch;
-        redraw();
+        switch (key.name)
+        {
+            case 'escape':
+                mode = 0;
+                break;
+            case 'enter':
+                mode = 0;
+                message = "";
+                break;
+            default :
+                message += ch;
+                break;
+        }
     }
+    redraw();
 });
 
-screen.key(['escape', 'C-c'], function(ch, key) {
+screen.key(['C-c'], function(ch, key) {
     return process.exit(0);
 });
 
@@ -133,6 +166,9 @@ var contactList = [];
 
 var redraw = function()
 {
+
+    status.setContent('Mode: '+(mode == 0? "{green-fg}normal{/green-fg}":"{red-fg}insert{/red-fg}"));
+
     box.setContent('{bold}Contacts:{/bold}');
     for (var i in contactList)
     {
