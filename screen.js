@@ -2,6 +2,9 @@ var blessed = require('blessed'),
     util    = require('util');
 
 var screen = blessed.screen();
+var program = blessed.program();
+
+
 
 var box = blessed.box(
     {
@@ -97,10 +100,25 @@ screen.key([':'], function(ch, key)
 
 var message = "";
 
-screen.key(['i'], function(ch, key)
+// modes: 0 - normal, 1 - insert
+var mode = 0;
+
+program.on('keypress', function(ch, key)
 {
-    message += "2";
-    redraw();
+    if (mode == 0)
+    {
+        switch (ch)
+        {
+            case 'i':
+                mode = 1;
+                break;
+        }
+    }
+    else
+    {
+        message += ch;
+        redraw();
+    }
 });
 
 screen.key(['escape', 'C-c'], function(ch, key) {
@@ -124,7 +142,12 @@ var redraw = function()
             contact.first_name,
             contact.last_name,
             (contact.unread > 0? contact.unread: " "));
-        box.insertLine(1, str);
+        box.pushLine(str);
+
+        var line = blessed.line({
+            content: "sdds"
+        })
+        box.pushLine(line);
     }
 
     input.setContent(message);
