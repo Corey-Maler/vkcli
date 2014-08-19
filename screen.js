@@ -5,7 +5,9 @@ var screen = blessed.screen();
 var program = blessed.program();
 
 var run_cmd = require('./lib/run_cmd');
+var shelljs = require('shelljs');
 
+shelljs.config.silent = true;
 
 
 var box = blessed.list(
@@ -98,7 +100,7 @@ screen.append(status);
 var message = "";
 var selected = 0;
 
-// modes: 0 - normal, 1 - insert, 2 - command, 3 - blocked
+// modes: 0 - normal, 1 - insert, 2 - command
 var mode = 0;
 
 var command = "";
@@ -108,15 +110,10 @@ var commands =
     {
         return process.exit(0);
     },
-    'r': function(args)
+    'r!': function(args)
     {
-        mode = 3;
-        run_cmd('date', [], function(text)
-        {
-            mode = 0;
-            message += text;
-            redraw();
-        });
+        var command = args.join(" ");
+        message += shelljs.exec(command).output;
     }
 }
 var showUnknownCommand = null;
@@ -145,6 +142,8 @@ var hotkeys =
     }
 
 }
+
+var arg_parse = /([^ ]+)/gi;
 
 program.on('keypress', function(ch, key)
 {
@@ -188,14 +187,20 @@ program.on('keypress', function(ch, key)
                     mode = 0;
                     command = 0;
                     break;
+                case 'backspace':
+                    command = command.substr(0, command.length - 1);
+                    break;
                 case 'enter':
                     mode = 0;
                     // todo: parse args
-                    if (command.length > 0)
+                    var a = command.match(arg_parse);
+
+                    if (a.length > 0)
                     {
-                        if (typeof commands[command] != "undefined")
+                        var args = a.slice(1);
+                        if (typeof commands[a[0]] != "undefined")
                         {
-                            commands[command]();
+                            commands[a[0]](args);
                         }
                         else
                         {
@@ -237,14 +242,7 @@ var redraw = function()
         }
         else
         {
-            if (mode == 3)
-            {
-                status.setContent('{red-fg}Blocked{/red-fg}');
-            }
-            else
-            {
-                status.setContent('Mode: '+(mode == 0? "{green-fg}normal{/green-fg}":"{red-fg}insert{/red-fg}"));
-            }
+            status.setContent('Mode: '+(mode == 0? "{green-fg}normal{/green-fg}":"{red-fg}insert{/red-fg}"));
         }
     }
     box.clearItems();

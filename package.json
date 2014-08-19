@@ -16,6 +16,7 @@
         "nconf": "*",
         "homedir": "*",
         "cli-color": "*",
-        "blessed": "*"
+        "blessed": "*",
+        "shelljs": "*"
     }
 }
