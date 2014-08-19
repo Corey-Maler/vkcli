@@ -2,53 +2,18 @@
 var open = require('open');
 var Q = require('q');
 var config = require('./lib/config');
-var blessed = require('blessed');
 
-var screen = blessed.screen();
+var screen = require('./screen');
 
-var box = blessed.box(
-    {
-        top: 'center',
-        left: 'center',
-        width: "50%",
-        height: '50%',
-        content: "hello {bold}world{/bold}!",
-        tags: true,
-        border:
-        {
-            type: 'line'
-        },
-        style:
-        {
-            fg: "red",
-            bg: "magenta",
-            border:
-            {
-                fg: "#f0f0f0"
-            },
-            hover:
-            {
-                bg: "green"
-            }
-        }
-    }
-);
+var cl = [
+    {first_name: "ana", last_name: "dsdddf", unread: 3, online: 1},
+    {first_name: "snqw", last_name: "dasf", unread: 1, online: 1},
+    {first_name: "rasdna", last_name: "ffgfdf", unread: 1, online: 1},
+    {first_name: "wndsf", last_name: "dfddf", unread: 3, online: 0},
+    {first_name: "enwe", last_name: "sdf", unread: 0, online: 1}
+];
 
-screen.append(box);
-
-screen.key([':'], function(ch, key)
-{
-    box.insertLine(1, 'foo');
-    screen.render();
-});
-
-screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-    return process.exit(0);
-});
-
-box.focus();
-
-screen.render();
+screen.setContactList(cl);
 
 var readline = require('readline');
 
