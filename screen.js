@@ -4,6 +4,8 @@ var blessed = require('blessed'),
 var screen = blessed.screen();
 var program = blessed.program();
 
+var run_cmd = require('./lib/run_cmd');
+
 
 
 var box = blessed.list(
@@ -96,7 +98,7 @@ screen.append(status);
 var message = "";
 var selected = 0;
 
-// modes: 0 - normal, 1 - insert, 2 - command
+// modes: 0 - normal, 1 - insert, 2 - command, 3 - blocked
 var mode = 0;
 
 var command = "";
@@ -105,6 +107,16 @@ var commands =
     'q': function()
     {
         return process.exit(0);
+    },
+    'r': function(args)
+    {
+        mode = 3;
+        run_cmd('date', [], function(text)
+        {
+            mode = 0;
+            message += text;
+            redraw();
+        });
     }
 }
 var showUnknownCommand = null;
@@ -225,7 +237,14 @@ var redraw = function()
         }
         else
         {
-            status.setContent('Mode: '+(mode == 0? "{green-fg}normal{/green-fg}":"{red-fg}insert{/red-fg}"));
+            if (mode == 3)
+            {
+                status.setContent('{red-fg}Blocked{/red-fg}');
+            }
+            else
+            {
+                status.setContent('Mode: '+(mode == 0? "{green-fg}normal{/green-fg}":"{red-fg}insert{/red-fg}"));
+            }
         }
     }
     box.clearItems();
